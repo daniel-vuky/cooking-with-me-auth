@@ -32,7 +32,19 @@ const validateSignInInput = asyncHandler(async (req, res, next) => {
     next();
 });
 
+const validateUpdatePasswordInput = asyncHandler(async (req, res, next) => {
+    const email = req.user.email;
+    const existedUser = await userModel.findByEmail(email);
+    const passwordMatched = await userModel.comparePassword(req.body.current_password, existedUser.password);
+    if (!existedUser || !passwordMatched) {
+        res.status(401);
+        throw new Error("Current password is not correct!");
+    }
+    next();
+});
+
 module.exports = {
     validateRegisterInput,
-    validateSignInInput
+    validateSignInInput,
+    validateUpdatePasswordInput
 }

@@ -22,6 +22,16 @@ const login = asyncHandler(async (req, res) => {
     res.status(200).json(user);
 });
 
+//@desc Change password
+//@route GET /users/changepassword
+//@access private
+const changePassword = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const newPassword = req.body.new_password;
+    const updatedUser = await userModel.findByIdAndUpdate(userId, {password: await userModel.hashPassword(newPassword)});
+    res.status(200).json(updatedUser);
+});
+
 //@desc Get current user information
 //@route GET /users/current
 //@access private
@@ -33,5 +43,6 @@ const current = asyncHandler(async (req, res) => {
 module.exports = {
     register,
     login,
+    changePassword,
     current
 }
