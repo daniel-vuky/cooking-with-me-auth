@@ -23,8 +23,7 @@ const validateSignInInput = asyncHandler(async (req, res, next) => {
         throw new Error("Missing required fields, please fulfill it and try again!");
     }
     const existedUser = await userModel.findByEmail(email);
-    const passwordMatched = await userModel.comparePassword(password, existedUser.password);
-    if (!existedUser || !passwordMatched) {
+    if (!existedUser || !(await userModel.comparePassword(password, existedUser.password))) {
         res.status(401);
         throw new Error("Email or Password is not correct!");
     }
@@ -32,8 +31,27 @@ const validateSignInInput = asyncHandler(async (req, res, next) => {
     next();
 });
 
+const validateForgotPasswordInput = asyncHandler(async (req, res, next) => {
+    const email = req.params.email;
+    if (!email) {
+        res.status(400);
+        throw new Error("Missing email field, please fulfill it and try again!");
+    }
+    const existedUser = await userModel.findByEmail(email);
+    if (!existedUser) {
+        res.status(401);
+        throw new Error("Can't find any account match with this email!");
+    }
+    req.existedUser = existedUser;
+    next();
+});
+
 const validateUpdatePasswordInput = asyncHandler(async (req, res, next) => {
     const email = req.user.email;
+    if (!email) {
+        res.status(400);
+        throw new Error("Missing email field, please fulfill it and try again!");
+    }
     const existedUser = await userModel.findByEmail(email);
     const passwordMatched = await userModel.comparePassword(req.body.current_password, existedUser.password);
     if (!existedUser || !passwordMatched) {
@@ -46,5 +64,6 @@ const validateUpdatePasswordInput = asyncHandler(async (req, res, next) => {
 module.exports = {
     validateRegisterInput,
     validateSignInInput,
+    validateForgotPasswordInput,
     validateUpdatePasswordInput
 }

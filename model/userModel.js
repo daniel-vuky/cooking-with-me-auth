@@ -3,7 +3,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const userSocialSchema = mongoose.Schema({
-    link: String
+    link: String,
+    type: String
 });
 
 const userSchema = mongoose.Schema({
