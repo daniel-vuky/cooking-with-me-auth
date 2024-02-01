@@ -20,7 +20,12 @@ const register = asyncHandler(async (req, res) => {
 //@access public
 const login = asyncHandler(async (req, res) => {
     const token = await userModel.generateJwtToken(req.body.email, req.body.id);
-    res.status(200).json({token: token});
+    if (!!token) {
+        res.status(200).json({token: token});
+        return;
+    }
+    res.status(404);
+    throw new Error("Can not generate the token");
 });
 
 //@desc Senf email reset password
